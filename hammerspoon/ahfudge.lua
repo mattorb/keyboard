@@ -16,8 +16,8 @@ local ahFudgeMode = {
   end,
   reset = function(self)
     self.active = false
-    self.isSDown = false
-    self.isDDown = false
+    self.isADown = false
+    self.isFDown = false
     self.ignoreNextA = false
     self.ignoreNextF = false
     self.modifiers = {}
@@ -45,9 +45,9 @@ ahFudgeModeActivationListener = eventtap.new({ eventTypes.keyDown }, function(ev
     -- Ah Fudge Mode. If 'f' is pressed by the time the following function
     -- executes, then activate Ah Fudge Mode. Otherwise, trigger an ordinary
     -- 'a' keystroke.
-      ahFudgeMode.isSDown = true
+      ahFudgeMode.isADown = true
     hs.timer.doAfter(MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES, function()
-      if ahFudgeMode.isDDown then
+      if ahFudgeMode.isFDown then
         ahFudgeMode:enter()
       else
         ahFudgeMode.ignoreNextA = true
@@ -66,9 +66,9 @@ ahFudgeModeActivationListener = eventtap.new({ eventTypes.keyDown }, function(ev
     -- Ah Fudge Mode. If 'a' is pressed by the time the following function
     -- executes, then activate Ah Fudge Mode. Otherwise, trigger an ordinary
     -- 'f' keystroke.
-    ahFudgeMode.isDDown = true
+    ahFudgeMode.isFDown = true
     hs.timer.doAfter(MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES, function()
-      if ahFudgeMode.isSDown then
+      if ahFudgeMode.isADown then
         ahFudgeMode:enter()
       else
         ahFudgeMode.ignoreNextF = true
@@ -110,7 +110,7 @@ end):start()
 
 --------------------------------------------------------------------------------
 -- Watch for h/j/k/l key down events in Ah Fudge Mode, and trigger the
--- corresponding arrow key events
+-- corresponding nav key events
 --------------------------------------------------------------------------------
 ahFudgeModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
   if not ahFudgeMode.active then
@@ -140,29 +140,6 @@ ahFudgeModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
     end
 
     keyUpDown(modifiers, keystroke)
-    return true
-  end
-end):start()
-
---------------------------------------------------------------------------------
--- Watch for i/o key down events in Ah Fudge Mode, and trigger the
--- corresponding key events to navigate to the previous/next tab respectively
---------------------------------------------------------------------------------
-ahFudgeModeTabNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(event)
-  if not ahFudgeMode.active then
-    return false
-  end
-
-  local charactersToKeystrokes = {
-    -- u = { {'cmd'}, '1' },          -- go to first tab
-    -- i = { {'cmd', 'shift'}, '[' }, -- go to previous tab
-    -- o = { {'cmd', 'shift'}, ']' }, -- go to next tab
-    -- p = { {'cmd'}, '9' },          -- go to last tab
-  }
-  local keystroke = charactersToKeystrokes[event:getCharacters()]
-
-  if keystroke then
-    keyUpDown(table.unpack(keystroke))
     return true
   end
 end):start()
