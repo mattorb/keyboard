@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode. \n    (home/pgdn/pgup/end)'),
+  statusMessage = message.new('(A)h (F)udge Mode. \n    (/window-prev/window-next/)\n    (home/pgdn/pgup/end)'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -25,6 +25,7 @@ local ahFudgeMode = {
   end,
 }
 ahFudgeMode:reset()
+
 
 ahFudgeModeActivationListener = eventtap.new({ eventTypes.keyDown }, function(event)
   -- If 'a' or 'f' is pressed in conjuction with any modifier keys
@@ -142,4 +143,24 @@ ahFudgeModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
     keyUpDown(modifiers, keystroke)
     return true
   end
+
+  if event:getCharacters(true):lower() == 'i' then
+    switcher:previous()
+    return true
+  end 
+
+  if event:getCharacters(true):lower() == 'o' then
+    switcher:next()
+    return true
+  end 
+
 end):start()
+
+function isAhFudgeModeActive()
+  return ahFudgeMode.active
+end
+
+local ahfudge_switcher = require('keyboard.ahfudge-switcher')
+
+switcher = ahfudge_switcher.new() -- default windowfilter: only visible windows, all Spaces
+switcher.modsPressed = isAhFudgeModeActive  

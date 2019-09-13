@@ -32,6 +32,7 @@ enableHotkeyForWindowsMatchingFilter = function(windowFilter, hotkey)
 end
 
 require('keyboard.ahfudge')
+require('keyboard.ahfudge-switcher')
 require('keyboard.control-escape')
 require('keyboard.hyper')
 require('keyboard.panes')
