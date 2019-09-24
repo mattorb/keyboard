@@ -112,6 +112,22 @@ superDuperModeModifierKeyListener = eventtap.new({ eventTypes.keyDown, eventType
 end):start()
 
 --------------------------------------------------------------------------------
+-- Activate application menu for 'm', nav with h/j/k/l after that
+--------------------------------------------------------------------------------
+superDuperModeMenuPopListener = eventtap.new({ eventTypes.keyDown }, function(event)
+  if not superDuperMode.active then
+    return false
+  end
+  
+  local character = event:getCharacters()
+
+  if character == 'm' then
+    keyUpDown({'ctrl','fn'}, 'f2')
+    return true
+  end
+end):start()
+
+--------------------------------------------------------------------------------
 -- Watch for h/j/k/l key down events in Super Duper Mode, and trigger the
 -- corresponding arrow key events
 --------------------------------------------------------------------------------
