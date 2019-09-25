@@ -128,6 +128,31 @@ superDuperModeMenuPopListener = eventtap.new({ eventTypes.keyDown }, function(ev
 end):start()
 
 --------------------------------------------------------------------------------
+-- Emit Mousewheel scroll events for for n/m/,/.
+--------------------------------------------------------------------------------
+superDuperModeMouseKeysListener = eventtap.new({ eventTypes.keyDown }, function(event)
+  if not superDuperMode.active then
+    return false
+  end
+
+  local character = event:getCharacters()
+
+  if     character == 'n' then
+    return true, {eventtap.event.newScrollEvent({3, 0}, {}, "line")}
+  elseif character == 'm' then
+    return true, {eventtap.event.newScrollEvent({0, -3}, {}, "line")}
+  elseif character == ',' then
+    return true, {eventtap.event.newScrollEvent({0, 3}, {}, "line")}
+  elseif character == '.' then
+    return true, {eventtap.event.newScrollEvent({-3, 0}, {}, "line")}
+  elseif character == '/' then
+    local currentpos = hs.mouse.getAbsolutePosition()
+    return true, {hs.eventtap.leftClick(currentpos)}
+  end
+
+end):start()
+
+--------------------------------------------------------------------------------
 -- Watch for h/j/k/l key down events in Super Duper Mode, and trigger the
 -- corresponding arrow key events
 --------------------------------------------------------------------------------
