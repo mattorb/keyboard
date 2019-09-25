@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode.\n i=window-prev, o=window-next\n h=home, j=pgdn, k=pgup, l=end'),
+  statusMessage = message.new('(A)h (F)udge Mode.\n h=home, j=pgdn, k=pgup, l=end\n i/o=windows'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
