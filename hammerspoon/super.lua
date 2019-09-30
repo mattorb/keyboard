@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local superDuperMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(S)uper (D)uper Mode.\nh/j/k/l=cursor, i/o=tabs, m=menu\na=alt, f=cmd, space=shift, caps=ctrl'),
+  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\nh/j/k/l=cursor, i/o=tabs\na=alt, f=cmd, space=shift, caps=ctrl'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -119,9 +119,9 @@ superDuperModeMenuPopListener = eventtap.new({ eventTypes.keyDown }, function(ev
     return false
   end
   
-  local character = event:getCharacters()
+  local characters = event:getCharacters()
 
-  if character == 'm' then
+  if characters == 'g' then
     keyUpDown({'ctrl','fn'}, 'f2')
     return true
   end
