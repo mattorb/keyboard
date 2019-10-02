@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local superDuperMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\nh/j/k/l=cursor, i/o=tabs\na=alt, f=cmd, space=shift, caps=ctrl'),
+  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\nh/j/k/l=cursor, i/o=tabs\na=alt, n/m/,/.// = mousewheel nudge/click\n f=cmd, space=shift, caps=ctrl'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
