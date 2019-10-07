@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local superDuperMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\nh/j/k/l=cursor, i/o=tabs\na=alt, n/m/,/.// = mousewheel nudge/click\n f=cmd, space=shift, caps=ctrl'),
+  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\n y/u/i/o=home/pgdn/pgup/end\n h/j/k/l=cursor\n n/m/,/.// = mousewheel nudge/click\n a=alt, f=cmd, space=shift, caps=ctrl'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -147,6 +147,9 @@ superDuperModeMouseKeysListener = eventtap.new({ eventTypes.keyDown }, function(
     return true, {eventtap.event.newScrollEvent({-3, 0}, {}, "line")}
   elseif character == '/' then
     local currentpos = hs.mouse.getAbsolutePosition()
+    return true, {hs.eventtap.rightClick(currentpos)}
+  elseif character == 'b' then
+    local currentpos = hs.mouse.getAbsolutePosition()
     return true, {hs.eventtap.leftClick(currentpos)}
   end
 
@@ -155,6 +158,9 @@ end):start()
 --------------------------------------------------------------------------------
 -- Watch for h/j/k/l key down events in Super Duper Mode, and trigger the
 -- corresponding arrow key events
+--------------------------------------------------------------------------------
+-- Watch for u/i/o/p key down events in Super Duper Mode, and trigger the 
+-- corresponding home/pgdn/pgup/end key events
 --------------------------------------------------------------------------------
 superDuperModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
   if not superDuperMode.active then
@@ -166,6 +172,10 @@ superDuperModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
     j = 'down',
     k = 'up',
     l = 'right',
+    y = 'home',
+    u = 'pagedown',
+    i = 'pageup',
+    o = 'end',
   }
 
   local keystroke = charactersToKeystrokes[event:getCharacters(true):lower()]
@@ -188,25 +198,3 @@ superDuperModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
   end
 end):start()
 
---------------------------------------------------------------------------------
--- Watch for i/o key down events in Super Duper Mode, and trigger the
--- corresponding key events to navigate to the previous/next tab respectively
---------------------------------------------------------------------------------
-superDuperModeTabNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(event)
-  if not superDuperMode.active then
-    return false
-  end
-
-  local charactersToKeystrokes = {
-    u = { {'cmd'}, '1' },          -- go to first tab
-    i = { {'cmd', 'shift'}, '[' }, -- go to previous tab
-    o = { {'cmd', 'shift'}, ']' }, -- go to next tab
-    p = { {'cmd'}, '9' },          -- go to last tab
-  }
-  local keystroke = charactersToKeystrokes[event:getCharacters()]
-
-  if keystroke then
-    keyUpDown(table.unpack(keystroke))
-    return true
-  end
-end):start()

@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode.\n h=home, j=pgdn, k=pgup, l=end\n i/o=windows'),
+  statusMessage = message.new('(A)h (F)udge Mode.\n u/i = app window switch\n h/j/k/l = first/prev/next/last tab nav'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -144,12 +144,12 @@ ahFudgeModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
     return true
   end
 
-  if event:getCharacters(true):lower() == 'i' then
+  if event:getCharacters(true):lower() == 'u' then
     switcher:previous()
     return true
   end 
 
-  if event:getCharacters(true):lower() == 'o' then
+  if event:getCharacters(true):lower() == 'i' then
     switcher:next()
     return true
   end 
@@ -164,3 +164,26 @@ local ahfudge_switcher = require('keyboard.ahfudge-switcher')
 
 switcher = ahfudge_switcher.new() -- default windowfilter: only visible windows, all Spaces
 switcher.modsPressed = isAhFudgeModeActive  
+
+--------------------------------------------------------------------------------
+-- Watch for i/o key down events in Ah Fudge Mode, and trigger the
+-- corresponding key events to navigate to the previous/next tab respectively
+--------------------------------------------------------------------------------
+ahFudgeModeTabNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(event)
+  if not ahFudgeMode.active then
+    return false
+  end
+
+  local charactersToKeystrokes = {
+    h = { {'cmd'}, '1' },          -- go to first tab
+    j = { {'cmd', 'shift'}, '[' }, -- go to previous tab
+    k = { {'cmd', 'shift'}, ']' }, -- go to next tab
+    l = { {'cmd'}, '9' },          -- go to last tab
+  }
+  local keystroke = charactersToKeystrokes[event:getCharacters()]
+
+  if keystroke then
+    keyUpDown(table.unpack(keystroke))
+    return true
+  end
+end):start()
