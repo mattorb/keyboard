@@ -10,6 +10,7 @@ statusmessage.new = function(messageText)
 
     local styledTextAttributes = {
       font = { name = 'Monaco', size = 24 },
+      color = { red = 1.0, green = 1.0, blue = 1.0, alpha=1.0 }
     }
 
     local styledText = styledtext.new('🔨 ' .. messageText, styledTextAttributes)
