@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode.\n u/i = app window switch\n h/j/k/l = first/prev/next/last tab nav'),
+  statusMessage = message.new('(A)h (F)udge Mode.\n u/i = app window switch\n h/j/k/l = first/prev/next/last tab nav\n m/, = prev/next space'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -166,7 +166,7 @@ switcher = ahfudge_switcher.new() -- default windowfilter: only visible windows,
 switcher.modsPressed = isAhFudgeModeActive  
 
 --------------------------------------------------------------------------------
--- Watch for i/o key down events in Ah Fudge Mode, and trigger the
+-- Watch for h/j/k/l key down events in Ah Fudge Mode, and trigger the
 -- corresponding key events to navigate to the previous/next tab respectively
 --------------------------------------------------------------------------------
 ahFudgeModeTabNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(event)
@@ -184,6 +184,32 @@ ahFudgeModeTabNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(eve
 
   if keystroke then
     keyUpDown(table.unpack(keystroke))
+    return true
+  end
+end):start()
+
+--------------------------------------------------------------------------------
+-- Watch for n/m/,/. key down events in Ah Fudge Mode, and trigger the
+-- corresponding key events to navigate spaces.  Requires giving permission to control
+-- 'System Events' app the first time it is used.
+--------------------------------------------------------------------------------
+ahFudgeModeSpaceNavKeyListener = eventtap.new({ eventTypes.keyDown }, function(event)
+  if not ahFudgeMode.active then
+    return false
+  end
+
+  if event:getCharacters() == 'n' then
+    hs.osascript.applescript("tell application \"System Events\" to key code 126 using control down")
+    return true
+  end
+
+  if event:getCharacters() == 'm' then
+    hs.osascript.applescript("tell application \"System Events\" to key code 123 using control down")
+    return true
+  end
+
+  if event:getCharacters() == ',' then
+    hs.osascript.applescript("tell application \"System Events\" to key code 124 using control down")
     return true
   end
 end):start()
