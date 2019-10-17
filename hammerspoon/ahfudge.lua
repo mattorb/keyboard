@@ -9,7 +9,7 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode.\n u/i = app window switch\n h/j/k/l = first/prev/next/last tab nav\n m/, = prev/next space'),
+  statusMessage = message.new('(A)h (F)udge Mode.\n u=prev app switch, i/o = app window switch\n h/j/k/l = first/prev/next/last tab nav\n m/, = prev/next space'),
   enter = function(self)
     if not self.active then self.statusMessage:show() end
     self.active = true
@@ -144,16 +144,28 @@ ahFudgeModeNavListener = eventtap.new({ eventTypes.keyDown }, function(event)
     return true
   end
 
-  if event:getCharacters(true):lower() == 'u' then
+  if event:getCharacters(true):lower() == 'i' then
     switcher:previous()
     return true
   end 
 
-  if event:getCharacters(true):lower() == 'i' then
+  if event:getCharacters(true):lower() == 'o' then
     switcher:next()
     return true
   end 
 
+end):start()
+
+-- Watch for 'u' and switch to previous app (cmd-tab)
+ahFudgeModeLastAppTabListener = eventtap.new({ eventTypes.keyDown }, function(event)
+  if not ahFudgeMode.active then
+    return false
+  end
+
+  if event:getCharacters(true):lower() == 'u' then
+    hs.osascript.applescript("tell application \"System Events\" to key code 48 using command down")
+    return true
+  end
 end):start()
 
 function isAhFudgeModeActive()
