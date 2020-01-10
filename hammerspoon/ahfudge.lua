@@ -1,6 +1,8 @@
+-- luacheck: globals hs
 local eventtap = hs.eventtap
 local eventTypes = hs.eventtap.event.types
-local message = require('keyboard.status-message')
+local statusMessage = require('keyboard.status-message')
+local helpMessage = require('keyboard.help-message')
 
 -- If 'a' and 'f' are *both* pressed within this time period, consider this to
 -- mean that they've been pressed simultaneously, and therefore we should enter
@@ -9,9 +11,14 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local ahFudgeMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(A)h (F)udge Mode.\n u=prev app switch, i/o = app window switch\n h/j/k/l = first/prev/next/last tab nav\n m/, = prev/next space'),
+  statusMessage = statusMessage.new('(A)h (F)udge Mode.'),
+  helpMessage = helpMessage.new('(A)h (F)udge Mode HELP.\n u=prev app switch, i/o = app window switch\n h/j/k/l = first/prev/next/last tab nav\n m/, = prev/next space'),
+
   enter = function(self)
-    if not self.active then self.statusMessage:show() end
+    if not self.active then
+      self.statusMessage:show()
+      self.helpTimer = hs.timer.delayed.new(3, function() self.helpMessage:show() end ):start()
+    end
     self.active = true
   end,
   reset = function(self)
@@ -22,10 +29,18 @@ local ahFudgeMode = {
     self.ignoreNextF = false
     self.modifiers = {}
     self.statusMessage:hide()
+    if not (self.helpTimer == nil) then self.helpTimer:stop() end
+    self.helpMessage:hide()
   end,
 }
 ahFudgeMode:reset()
 
+ahFudgeExtendedHelpBumper = eventtap.new({ eventTypes.keyDown }, function(event)
+  if ahFudgeMode.active then
+    -- in this case 'start' restarts the countdown timer if already started
+    ahFudgeMode.helpTimer:start()
+  end
+end):start()
 
 ahFudgeModeActivationListener = eventtap.new({ eventTypes.keyDown }, function(event)
   -- If 'a' or 'f' is pressed in conjuction with any modifier keys

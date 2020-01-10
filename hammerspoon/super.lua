@@ -1,6 +1,8 @@
+-- luacheck: globals hs hyper
 local eventtap = hs.eventtap
 local eventTypes = hs.eventtap.event.types
-local message = require('keyboard.status-message')
+local statusMessage = require('keyboard.status-message')
+local helpMessage = require('keyboard.help-message')
 
 -- If 's' and 'd' are *both* pressed within this time period, consider this to
 -- mean that they've been pressed simultaneously, and therefore we should enter
@@ -9,9 +11,14 @@ local MAX_TIME_BETWEEN_SIMULTANEOUS_KEY_PRESSES = 0.04 -- 40 milliseconds
 
 local superDuperMode = {
   -- caps->ctrl is from karabiner mappings
-  statusMessage = message.new('(S)uper (D)uper Mode.  g=menu\n y/u/i/o=home/pgdn/pgup/end\n h/j/k/l=cursor\n n/m/,/.// = mousewheel nudge/click\n a=alt, f=cmd, space=shift, caps=ctrl'),
+  statusMessage = statusMessage.new('(S)uper (D)uper Mode.'),
+  helpMessage = helpMessage.new('(S)uper (D)uper Mode HELP\ng=menu\n y/u/i/o=home/pgdn/pgup/end\n h/j/k/l=cursor\n n/m/,/.// = mousewheel nudge/click\n a=alt, f=cmd, space=shift, caps=ctrl'),
+
   enter = function(self)
-    if not self.active then self.statusMessage:show() end
+    if not self.active then
+      self.statusMessage:show()
+      self.helpTimer = hs.timer.delayed.new(3, function() self.helpMessage:show() end ):start()
+    end
     self.active = true
   end,
   reset = function(self)
@@ -22,9 +29,19 @@ local superDuperMode = {
     self.ignoreNextD = false
     self.modifiers = {}
     self.statusMessage:hide()
+    if not (self.helpTimer == nil) then self.helpTimer:stop() end
+    self.helpMessage:hide()
   end,
 }
 superDuperMode:reset()
+
+superDuperExtendedHelpBumper = eventtap.new({ eventTypes.keyDown}, function(event)
+  if superDuperMode.active then
+    -- in this case 'start' restarts the countdown timer if already started
+    superDuperMode.helpTimer:start()
+  end
+end):start()
+
 
 superDuperModeActivationListener = eventtap.new({ eventTypes.keyDown }, function(event)
   -- If 's' or 'd' is pressed in conjuction with any modifier keys
