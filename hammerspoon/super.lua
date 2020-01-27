@@ -38,6 +38,7 @@ superDuperMode:reset()
 superDuperExtendedHelpBumper = eventtap.new({ eventTypes.keyDown}, function(event)
   if superDuperMode.active then
     -- in this case 'start' restarts the countdown timer if already started
+    superDuperMode.helpMessage:hide()
     superDuperMode.helpTimer:start()
   end
 end):start()

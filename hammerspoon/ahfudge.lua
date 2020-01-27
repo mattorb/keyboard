@@ -38,6 +38,7 @@ ahFudgeMode:reset()
 ahFudgeExtendedHelpBumper = eventtap.new({ eventTypes.keyDown }, function(event)
   if ahFudgeMode.active then
     -- in this case 'start' restarts the countdown timer if already started
+    ahFudgeMode.helpMessage:hide()
     ahFudgeMode.helpTimer:start()
   end
 end):start()
