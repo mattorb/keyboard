@@ -1,7 +1,8 @@
 hyper = {"cmd", "alt", "ctrl", "shift"}
+nohyper = {"alt"}
 
 return {
-  modifiers = hyper,
+  modifiers = nohyper,
   showHelp  = true,
   trigger   = 'w',
   mappings  = {
